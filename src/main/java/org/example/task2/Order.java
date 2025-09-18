@@ -1,41 +1,29 @@
 package org.example.task2;
 
 public class Order {
-
-    public long id;
-    public String customer;
+    private final long id;
+    private final String customer;
 
     public Order(long id, String customer) {
+        if (customer == null || customer.isBlank()) throw new IllegalArgumentException("empty customer");
         this.id = id;
         this.customer = customer;
     }
 
     public String formOrderBill(Cart cart) {
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("Order number ").append(id).append(" for customer ").append(customer);
-        builder.append("\n------------------\n");
+        StringBuilder b = new StringBuilder();
+        b.append("Order number ").append(id).append(" for customer ").append(customer)
+                .append("\n------------------\n");
 
         double sum = 0.0;
-
-        for (int i = 0; i < cart.index; i++) {
-
-            sum += cart.contents[i].price;
-
-            builder.append("Item id: ");
-            builder.append(cart.contents[i].id);
-            builder.append(" name: ");
-            builder.append(cart.contents[i].name);
-            builder.append(" price: ");
-            builder.append(cart.contents[i].price);
-            builder.append("\n");
+        for (int i = 0; i < cart.size(); i++) {
+            Item it = cart.get(i);
+            sum += it.getPrice();
+            b.append("Item id: ").append(it.getId())
+                    .append(" name: ").append(it.getName())
+                    .append(" price: ").append(it.getPrice()).append("\n");
         }
-
-        builder.append("------------------\n");
-        builder.append("Total sum: ");
-        builder.append(sum);
-
-
-        return builder.toString();
+        b.append("------------------\nTotal sum: ").append(sum);
+        return b.toString();
     }
 }
