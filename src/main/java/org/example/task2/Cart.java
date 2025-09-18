@@ -3,67 +3,48 @@ package org.example.task2;
 import java.util.Arrays;
 
 public class Cart {
+    private Item[] contents;
+    private int size = 0;
 
-    public Item[] contents;
-    int index;
-
-    Cart(Item[] _contents) {
-        this.contents = _contents;
+    public Cart(int capacity) {
+        if (capacity <= 0) throw new IllegalArgumentException("capacity <= 0");
+        contents = new Item[capacity];
     }
 
-    public void removeById(int itemIndex) {
+    public int size() { return size; }
+    public boolean isEmpty() { return size == 0; }
+    public boolean isFull() { return size == contents.length; }
 
-        if (index == 0)
-            return;
-
-        int foundItemIndex = findItemInArray(contents[itemIndex]);
-
-        if (foundItemIndex == -1)
-            return;
-
-        if (foundItemIndex == index - 1) {
-            contents[index - 1] = null;
-            index--;
-            return;
-        }
-
-        shiftArray(foundItemIndex);
+    public void add(Item item) {
+        if (isFull()) grow();
+        contents[size++] = item;
     }
 
-    public void shiftArray(int itemIndex) {
-        for (int i = itemIndex; i < index - 1; i++) {
-            contents[i] = contents[i + 1];
-        }
-        contents[index-1] = null;
-        index--;
-    }
-
-    public int findItemInArray(Item item) {
-        for (int i = 0; i < index; i++) {
-            if (contents[i].id == item.id) {
-                return i;
+    public void removeById(long id) {
+        if (isEmpty()) return;
+        for (int i = 0; i < size; i++) {
+            if (contents[i].getId() == id) {
+                removeAtIndex(i);
+                return;
             }
         }
-
-        return -1;
     }
 
-    void add(Item item) {
-        if (isCartFull())
-            return;
-
-        contents[index] = item;
-        index++;
+    private void removeAtIndex(int idx) {
+        for (int i = idx; i < size - 1; i++) contents[i] = contents[i + 1];
+        contents[--size] = null;
     }
 
-    public boolean isCartFull() {
-        return index == contents.length;
+    private void grow() { contents = Arrays.copyOf(contents, contents.length * 2); }
+
+    public Item get(int i) {
+        if (i < 0 || i >= size) throw new IndexOutOfBoundsException();
+        return contents[i];
     }
 
     @Override
     public String toString() {
-        return "Cart{" +
-                "contents=" + Arrays.toString(contents) +
-                '}' + "\n";
+        return "Cart{contents=" + Arrays.toString(Arrays.copyOf(contents, size)) + "}\n";
     }
 }
+
